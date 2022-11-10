@@ -31,7 +31,7 @@ class CartViewModel extends GetxController {
         cartProducts.add(CartModel.fromMap(i));
       }
       calcTotal();
-      update();
+      update(); 
     });
   }
 

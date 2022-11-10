@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerce_p/models/cart_model.dart';
-import 'package:ecommerce_p/models/order_model.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,24 +12,12 @@ class CartViewModel extends GetxController {
   List<CartModel> cartProducts = [];
   DbHelper? dbHelper;
   int total = 0;
-  String radioV = 'Standard';
-  TextEditingController? streetCont;
-  TextEditingController? cityCont;
-  TextEditingController? stateCont;
-  TextEditingController? countryCont;
-  CollectionReference orderRef =
-      FirebaseFirestore.instance.collection('orders');
-
   @override
   void onInit() {
     dbHelper = DbHelper();
     dbHelper!.createDatabase();
     getAllToCart();
     super.onInit();
-    streetCont = TextEditingController();
-    cityCont = TextEditingController();
-    stateCont = TextEditingController();
-    countryCont = TextEditingController();
   }
 
   Future<void> addToCart(CartModel model) async {
@@ -77,45 +63,5 @@ class CartViewModel extends GetxController {
         update();
       });
     }
-  }
-
-  Future<void> sendOrder() async {
-    Get.dialog(const Center(
-      child: CircularProgressIndicator(),
-    ));
-    OrderModel orderModel = OrderModel(
-        deliveryType: radioV,
-        userId: firebaseAuth.currentUser!.uid,
-        address:
-            '${streetCont!.text},${cityCont!.text},${stateCont!.text},${countryCont!.text}',
-        isDeliverd: false,
-        products: cartProducts);
-    await orderRef.doc().set(orderModel.toMap()).then((value) {
-      dbHelper!.clearTable();
-      cartProducts.clear();
-      total = 0;
-      Get.back();
-      Get.back();
-      Get.defaultDialog(
-          title: 'Congratulates',
-          content: const Text('the order sent sucsessfully'),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Get.back();
-                },
-                child: const Text('Ok'))
-          ]);
-    });
-    update();
-  }
-
-  @override
-  void onClose() {
-    cityCont!.dispose();
-    stateCont!.dispose();
-    streetCont!.dispose();
-    countryCont!.dispose();
-    super.onClose();
   }
 }
